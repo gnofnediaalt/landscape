@@ -86,7 +86,7 @@ while running:
         bot_hills(screen)
         randomize_grass(screen)
 
-    if dt < 10:
+    if dt > 10:
         fps = 2
 
     
