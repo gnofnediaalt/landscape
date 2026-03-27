@@ -1,5 +1,6 @@
 import pygame
 import math
+import random
 
 pygame.init()
 
@@ -14,11 +15,12 @@ clock = pygame.time.Clock()
 # ---------------------------
 
 dt = 0
+fps = 30
 startup_sound = [pygame.mixer.Sound("winxp.wav"), False]
 
 # ---------------------------
 
-def hills(surface):
+def top_hills(surface):
     points_top = []
     for x in range(0, WIDTH):
         offset = 20 * math.sin(x * 0.01 + dt / 5)
@@ -27,7 +29,8 @@ def hills(surface):
     points_top.append((WIDTH, HEIGHT))
     points_top.append((0, HEIGHT))
     pygame.draw.polygon(surface, (50, 200, 50), points_top)
-    
+
+def bot_hills(surface):
     points_bot = []
     for x in range(-50, WIDTH+50):
         offset = 20 * math.sin(x * 0.01 + dt / 3)
@@ -36,6 +39,26 @@ def hills(surface):
     points_bot.append((WIDTH+50, HEIGHT+50))
     points_bot.append((-50, HEIGHT+50))
     pygame.draw.polygon(surface, (50, 150, 50), points_bot)
+
+def randomize_grass(surface):
+    px = pygame.PixelArray(surface)
+    
+    for x in range(WIDTH):
+        for y in range(HEIGHT):
+            colour = surface.unmap_rgb(px[x, y])
+            
+            if colour.g > 140:
+                r = int(colour.r * ((random.random() - 0.5) / 10 + 1))
+                g = int(colour.g * ((random.random() - 0.5) / 10 + 1))
+                b = int(colour.b * ((random.random() - 0.5) / 10 + 1))
+                
+                r = max(0, min(255, r))
+                g = max(0, min(255, g))
+                b = max(0, min(255, b))
+                
+                px[x, y] = surface.map_rgb((r, g, b))
+    
+    del px
 
 # ---------------------------
 
@@ -59,12 +82,17 @@ while running:
 
     else:
         screen.fill("#5581EE")
-        hills(screen)
+        top_hills(screen)
+        bot_hills(screen)
+        randomize_grass(screen)
+
+    if dt < 10:
+        fps = 2
 
     
     # UTILITIES
     pygame.display.flip()
-    dt += clock.tick(30) / 1000
+    dt += clock.tick(fps) / 1000
     #---------------------------
 
 pygame.quit()
