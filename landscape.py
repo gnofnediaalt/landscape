@@ -30,15 +30,15 @@ def top_hills(surface):
     points_top.append((0, HEIGHT))
     pygame.draw.polygon(surface, (50, 200, 50), points_top)
 
-def bot_hills(surface):
+def bot_hills(surface, shift=0, colour=(50, 150, 50)):
     points_bot = []
-    for x in range(-50, WIDTH+50):
+    for x in range(-50+shift, WIDTH+50+shift):
         offset = 20 * math.sin(x * 0.01 + dt / 3)
         y = 482 - (((x - 250)/120) ** 3 + 85 + offset)
-        points_bot.append((x, y))
+        points_bot.append((x-shift, y))
     points_bot.append((WIDTH+50, HEIGHT+50))
     points_bot.append((-50, HEIGHT+50))
-    pygame.draw.polygon(surface, (50, 150, 50), points_bot)
+    pygame.draw.polygon(surface, colour, points_bot)
 
 def randomize_grass(surface):
     px = pygame.PixelArray(surface)
@@ -70,7 +70,8 @@ while running:
             running = False
     
     # GAME STATE UPDATES  
-    if dt < 3:
+    if dt % 24 < 3:
+        fps = 30
         screen.fill("#000000")
         if not startup_sound[1]:
             pygame.mixer.Sound.play(startup_sound[0])
@@ -80,15 +81,25 @@ while running:
         pygame.draw.rect(screen, "#00B8F8", (190, 251, 100, 100))
         pygame.draw.rect(screen, "#FFC000", (310, 251, 100, 100))
 
-    else:
+    elif dt % 24 < 15:
+        if dt % 24 < 9:
+            fps = 30
+        elif dt % 24 < 12:
+            fps = 8
+        else:
+            fps = 2
         screen.fill("#5581EE")
         top_hills(screen)
+        bot_hills(screen, 30, (20, 70, 80))
         bot_hills(screen)
         randomize_grass(screen)
-
-    if dt > 10:
-        fps = 2
-
+    
+    elif dt % 24 < 16:
+        screen.fill("#000000")
+    
+    else:
+        screen.fill("#000082")
+        
     
     # UTILITIES
     pygame.display.flip()
