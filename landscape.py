@@ -17,6 +17,13 @@ clock = pygame.time.Clock()
 dt = 0
 fps = 30
 startup_sound = [pygame.mixer.Sound("winxp.wav"), False]
+try:
+    pixel_font = pygame.font.Font("PixelifySans-VariableFont_wght.ttf", 16)
+except pygame.error as e:
+    print(f"Error loading font: {e}. Using system font.")
+    pixel_font = pygame.font.SysFont(None, 16)
+
+text_surface = pixel_font.render("A problem has been detected and Windows has been shut down to prevent damage to your computer.\n\nGRAPHICS_TOO_FANCY", True, ("#FFFFFF"), wraplength=560)
 
 # ---------------------------
 
@@ -99,7 +106,8 @@ while running:
     
     else:
         screen.fill("#000082")
-        
+        screen.blit(text_surface, (30, 30))
+        startup_sound[1] = False
     
     # UTILITIES
     pygame.display.flip()
