@@ -23,7 +23,7 @@ except pygame.error as e:
     print(f"Error loading font: {e}. Using system font.")
     pixel_font = pygame.font.SysFont(None, 16)
 
-text_surface = pixel_font.render("A problem has been detected and Windows has been shut down to prevent damage to your computer.\n\nGRAPHICS_TOO_FANCY", True, ("#FFFFFF"), wraplength=560)
+text_surface = pixel_font.render("A problem has been detected and Windows has been shut down to prevent damage to your computer.\n\nPROJECT_TOO_AMAZING\n\nIf this is the first time you've seen this error screen, restart your computer. If this screen appears again, follow these steps:\n\nCheck to make sure any new hardware or software is properly installed. If this is a new installation, ask your hardware or software manufacturer for any Windows updates you might need.\n\nIf problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory options such as caching or shadowing. If you need to use Safe Mode to remove or disable components, restart your computer, press F8 to select Advanced Startup Options, and then select Safe Mode.\n\nTechnical Infromation:\n\n*** STOP: 0x000000ED (0xMRGALLO00 0xIS_TOO000 0xIMPRESSED 0xBY_THIS00)", True, ("#FFFFFF"), wraplength=560)
 
 # ---------------------------
 
@@ -46,6 +46,17 @@ def bot_hills(surface, shift=0, colour=(50, 150, 50)):
     points_bot.append((WIDTH+50, HEIGHT+50))
     points_bot.append((-50, HEIGHT+50))
     pygame.draw.polygon(surface, colour, points_bot)
+
+def cloud(surface, type, position=[300, 300], scale=1, colour=[230, 230, 230]):
+    for i in range(len(colour)):
+        colour[i] = max(0, min(255, int(colour[i] + (5 * math.sin(dt / 3)))))
+    if type == "duo":
+        pygame.draw.circle(surface, colour, position, 20*scale)
+        pygame.draw.circle(surface, colour, (position[0]-20*scale, position[1]-12*scale), 14*scale)
+    if type == "tri":
+        pygame.draw.circle(surface, colour, position, 20*scale)
+        pygame.draw.circle(surface, colour, (position[0]-20*scale, position[1]+8*scale), 14*scale)
+        pygame.draw.circle(surface, colour, (position[0]+20*scale, position[1]+7*scale), 16*scale)
 
 def randomize_grass(surface):
     px = pygame.PixelArray(surface)
@@ -100,13 +111,14 @@ while running:
         bot_hills(screen, 30, (20, 70, 80))
         bot_hills(screen)
         randomize_grass(screen)
+        cloud(screen, "tri", [200, 200], 1.5)
     
     elif dt % 24 < 16:
         screen.fill("#000000")
     
     else:
         screen.fill("#000082")
-        screen.blit(text_surface, (30, 30))
+        screen.blit(text_surface, (25, 25))
         startup_sound[1] = False
     
     # UTILITIES
