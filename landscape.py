@@ -23,7 +23,7 @@ except pygame.error as e:
     print(f"Error loading font: {e}. Using system font.")
     pixel_font = pygame.font.SysFont(None, 16)
 
-text_surface = pixel_font.render("A problem has been detected and Windows has been shut down to prevent damage to your computer.\n\nPROJECT_TOO_AMAZING\n\nIf this is the first time you've seen this error screen, restart your computer. If this screen appears again, follow these steps:\n\nCheck to make sure any new hardware or software is properly installed. If this is a new installation, ask your hardware or software manufacturer for any Windows updates you might need.\n\nIf problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory options such as caching or shadowing. If you need to use Safe Mode to remove or disable components, restart your computer, press F8 to select Advanced Startup Options, and then select Safe Mode.\n\nTechnical Infromation:\n\n*** STOP: 0x000000ED (0xMRGALLO00 0xIS_TOO000 0xIMPRESSED 0xBY_THIS00)", True, ("#FFFFFF"), wraplength=560)
+text_surface = pixel_font.render("A problem has been detected and Windows has been shut down to prevent damage to your computer.\n\nPROJECT_TOO_AMAZING\n\nIf this is the first time you've seen this error screen, restart your computer. If this screen appears again, follow these steps:\n\nCheck to make sure any new hardware or software is properly installed. If this is a new installation, ask your hardware or software manufacturer for any Windows updates you might need.\n\nIf problems continue, disable or remove any newly installed hardware or software. Disable BIOS memory options such as caching or shadowing. If you need to use Safe Mode to remove or disable components, restart your computer, press F8 to select Advanced Startup Options, and then select Safe Mode.\n\nTechnical Infromation:\n\n*** STOP: 0x000000ED (0xMADE0000 0xBY000000 0xAIDEN000 0xFONG0000)", True, ("#FFFFFF"), wraplength=560)
 
 # ---------------------------
 
@@ -47,37 +47,53 @@ def bot_hills(surface, shift=0, colour=(50, 150, 50)):
     points_bot.append((-50, HEIGHT+50))
     pygame.draw.polygon(surface, colour, points_bot)
 
-def cloud(surface, type, position=[300, 300], scale=1, colour=[230, 230, 230]):
+def cloud(surface, type, position=[300, 300], scale=1, colour=[220, 220, 220]):
+    offset = int(-1.5 * math.sin(0.9 * dt))
     for i in range(len(colour)):
-        colour[i] = max(0, min(255, int(colour[i] + (5 * math.sin(dt / 3)))))
+        cooler = []
+        cooler.append(int(max(0, min(255, (offset + colour[i])))))
     if type == "duo":
-        pygame.draw.circle(surface, colour, position, 20*scale)
-        pygame.draw.circle(surface, colour, (position[0]-20*scale, position[1]-12*scale), 14*scale)
+        pygame.draw.circle(surface, cooler, position, 20*scale)
+        pygame.draw.circle(surface, cooler, (position[0]-20*scale, position[1]-12*scale), 14*scale)
     if type == "tri":
-        pygame.draw.circle(surface, colour, position, 20*scale)
-        pygame.draw.circle(surface, colour, (position[0]-20*scale, position[1]+8*scale), 14*scale)
-        pygame.draw.circle(surface, colour, (position[0]+20*scale, position[1]+7*scale), 16*scale)
+        pygame.draw.circle(surface, cooler, position, 20*scale)
+        pygame.draw.circle(surface, cooler, (position[0]-20*scale, position[1]+8*scale), 14*scale)
+        pygame.draw.circle(surface, cooler, (position[0]+20*scale, position[1]+7*scale), 16*scale)
 
 def randomize_grass(surface):
     px = pygame.PixelArray(surface)
-    
     for x in range(WIDTH):
         for y in range(HEIGHT):
             colour = surface.unmap_rgb(px[x, y])
-            
             if colour.g > 140:
                 r = int(colour.r * ((random.random() - 0.5) / 10 + 1))
                 g = int(colour.g * ((random.random() - 0.5) / 10 + 1))
                 b = int(colour.b * ((random.random() - 0.5) / 10 + 1))
-                
                 r = max(0, min(255, r))
                 g = max(0, min(255, g))
                 b = max(0, min(255, b))
-                
                 px[x, y] = surface.map_rgb((r, g, b))
-    
     del px
 
+def sunbeam(surface):
+    px = pygame.PixelArray(surface)
+    offset = math.sin(0.9 * dt) * 0.5 + 1
+    denom = math.sqrt(0.3**2 + 1)
+    for x in range(WIDTH):
+        for y in range(HEIGHT):
+            colour = surface.unmap_rgb(px[x, y])
+            if (0.2 * x + 140 <= y) and (0.4 * x + 260 >= y):
+                d = abs(0.3*x - y + 200) / denom
+                shade = max(0, 1 - d*offset/100) * 40
+                r = int(colour.r + shade)
+                g = int(colour.g + shade)
+                b = int(colour.b + shade)
+                r = max(0, min(255, r))
+                g = max(0, min(255, g))
+                b = max(0, min(255, b))
+                px[x, y] = surface.map_rgb((r, g, b))
+    del px
+    
 # ---------------------------
 
 running = True
@@ -111,7 +127,15 @@ while running:
         bot_hills(screen, 30, (20, 70, 80))
         bot_hills(screen)
         randomize_grass(screen)
+        cloud(screen, "tri", [26, 20], 0.8)
+        cloud(screen, "duo", [70, 30], 0.8)
+        cloud(screen, "duo", [120, 35], 0.9)
+        cloud(screen, "tri", [400, 50], 2.5)
+        cloud(screen, "tri", [500, 110], 2.5)
         cloud(screen, "tri", [200, 200], 1.5)
+        cloud(screen, "tri", [200, 200], 1.5)
+        cloud(screen, "tri", [200, 200], 1.5)
+        sunbeam(screen)
     
     elif dt % 24 < 16:
         screen.fill("#000000")
