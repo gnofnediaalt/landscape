@@ -17,6 +17,7 @@ clock = pygame.time.Clock()
 dt = 0
 fps = 30
 startup_sound = [pygame.mixer.Sound("winxp.wav"), False]
+crash_sound = [pygame.mixer.Sound("xpcrash.wav"), False]
 try:
     pixel_font = pygame.font.Font("PixelifySans-VariableFont_wght.ttf", 16)
 except pygame.error as e:
@@ -48,10 +49,12 @@ def bot_hills(surface, shift=0, colour=(50, 150, 50)):
     pygame.draw.polygon(surface, colour, points_bot)
 
 def cloud(surface, type, position=[300, 300], scale=1, colour=[220, 220, 220]):
-    offset = int(-1.5 * math.sin(0.9 * dt))
+    offset = int(-15 * math.sin(0.9 * dt))
+    cooler = []
     for i in range(len(colour)):
-        cooler = []
         cooler.append(int(max(0, min(255, (offset + colour[i])))))
+    if type == "mon":
+        pygame.draw.circle(surface, cooler, position, 20*scale)
     if type == "duo":
         pygame.draw.circle(surface, cooler, position, 20*scale)
         pygame.draw.circle(surface, cooler, (position[0]-20*scale, position[1]-12*scale), 14*scale)
@@ -59,6 +62,10 @@ def cloud(surface, type, position=[300, 300], scale=1, colour=[220, 220, 220]):
         pygame.draw.circle(surface, cooler, position, 20*scale)
         pygame.draw.circle(surface, cooler, (position[0]-20*scale, position[1]+8*scale), 14*scale)
         pygame.draw.circle(surface, cooler, (position[0]+20*scale, position[1]+7*scale), 16*scale)
+    if type == "lin":
+        pygame.draw.circle(surface, cooler, position, 15*scale)
+        pygame.draw.circle(surface, cooler, (position[0]-20*scale, position[1]-8*scale), 11*scale)
+        pygame.draw.circle(surface, cooler, (position[0]+20*scale, position[1]+7*scale), 13*scale)
 
 def randomize_grass(surface):
     px = pygame.PixelArray(surface)
@@ -114,11 +121,12 @@ while running:
         pygame.draw.rect(screen, "#83C501", (310, 131, 100, 100))
         pygame.draw.rect(screen, "#00B8F8", (190, 251, 100, 100))
         pygame.draw.rect(screen, "#FFC000", (310, 251, 100, 100))
+        crash_sound[1] = False
 
-    elif dt % 24 < 15:
-        if dt % 24 < 9:
+    elif dt % 24 < 17:
+        if dt % 24 < 12:
             fps = 30
-        elif dt % 24 < 12:
+        elif dt % 24 < 15:
             fps = 8
         else:
             fps = 2
@@ -127,18 +135,32 @@ while running:
         bot_hills(screen, 30, (20, 70, 80))
         bot_hills(screen)
         randomize_grass(screen)
-        cloud(screen, "tri", [26, 20], 0.8)
-        cloud(screen, "duo", [70, 30], 0.8)
-        cloud(screen, "duo", [120, 35], 0.9)
-        cloud(screen, "tri", [400, 50], 2.5)
-        cloud(screen, "tri", [500, 110], 2.5)
-        cloud(screen, "tri", [200, 200], 1.5)
-        cloud(screen, "tri", [200, 200], 1.5)
-        cloud(screen, "tri", [200, 200], 1.5)
+        cloud(screen, "mon", [200, 175], 0.5)
+        cloud(screen, "tri", [26, 20], 0.9)
+        cloud(screen, "duo", [70, 30], 0.7)
+        cloud(screen, "duo", [120, 35], 0.7)
+        cloud(screen, "tri", [440, 40], 1.1)
+        cloud(screen, "tri", [540, 90], 1.2)
+        cloud(screen, "tri", [600, 10], 1)
+        cloud(screen, "duo", [560, 50], 0.8)
+        cloud(screen, "lin", [500, 23], 0.8)
+        cloud(screen, "lin", [250, 100], 0.9)
+        cloud(screen, "lin", [290, 140], 0.6)
+        cloud(screen, "duo", [440, 215], 0.8)
+        cloud(screen, "tri", [480, 245], 0.8)
+        cloud(screen, "duo", [480, 185], 0.8)
+        cloud(screen, "lin", [540, 200], 1)
+        cloud(screen, "duo", [120, 200], 0.7)
+        cloud(screen, "duo", [550, 245], 0.8)
+        cloud(screen, "lin", [300, 25], 0.8)
+        cloud(screen, "mon", [390, 185], 0.8)
         sunbeam(screen)
     
-    elif dt % 24 < 16:
+    elif dt % 24 < 18:
         screen.fill("#000000")
+        if not crash_sound[1]:
+            pygame.mixer.Sound.play(crash_sound[0])
+            crash_sound[1] = True
     
     else:
         screen.fill("#000082")
